@@ -1,36 +1,34 @@
 // @ts-check
-const tseslint = require("@typescript-eslint/eslint-plugin");
-const tsParser = require("@typescript-eslint/parser");
-const prettierConfig = require("eslint-config-prettier");
+const tseslint = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+const prettierConfig = require('eslint-config-prettier');
 
 /**
  * Shared TypeScript rules applied in the TS config block.
  * Consumers spread this into their own `rules` object.
  */
 const sharedTsRules = {
-  ...tseslint.configs["recommended"].rules,
+  ...tseslint.configs['recommended'].rules,
 
   // Null safety
-  "no-unsafe-optional-chaining": "error",
-  "@typescript-eslint/no-unnecessary-condition": "error",
-  "@typescript-eslint/no-non-null-assertion": "warn",
-  "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-  "@typescript-eslint/prefer-optional-chain": "error",
-  "@typescript-eslint/prefer-nullish-coalescing": [
-    "error",
+  'no-unsafe-optional-chaining': 'error',
+  '@typescript-eslint/no-unnecessary-condition': 'error',
+  '@typescript-eslint/no-non-null-assertion': 'warn',
+  '@typescript-eslint/no-non-null-asserted-optional-chain': 'error',
+  '@typescript-eslint/prefer-optional-chain': 'error',
+  '@typescript-eslint/prefer-nullish-coalescing': [
+    'error',
     {
       ignoreConditionalTests: true,
       ignorePrimitives: { string: true, number: true, boolean: true },
     },
   ],
 
-  "no-restricted-syntax": [
-    "warn",
+  'no-restricted-syntax': [
+    'warn',
     {
-      selector:
-        "LogicalExpression[operator='??'][right.type='Literal'][right.raw='null']",
-      message:
-        "Avoid `?? null`; keep `undefined` unless a boundary contract requires `null`.",
+      selector: "LogicalExpression[operator='??'][right.type='Literal'][right.raw='null']",
+      message: 'Avoid `?? null`; keep `undefined` unless a boundary contract requires `null`.',
     },
   ],
 };
@@ -40,16 +38,16 @@ const sharedTsRules = {
  */
 const sharedBaseRules = {
   // Code style
-  "object-shorthand": "error",
-  "prefer-destructuring": "warn",
-  "prefer-arrow-callback": "error",
-  "prefer-const": "error",
+  'object-shorthand': 'error',
+  'prefer-destructuring': 'warn',
+  'prefer-arrow-callback': 'error',
+  'prefer-const': 'error',
 
   // Formatting (backup for lines Prettier can't wrap)
-  "max-len": ["warn", { code: 100, ignoreUrls: true, ignoreStrings: true }],
+  'max-len': ['warn', { code: 100, ignoreUrls: true, ignoreStrings: true }],
 
   // Logging
-  "no-console": ["warn", { allow: ["warn", "error"] }],
+  'no-console': ['warn', { allow: ['warn', 'error'] }],
 };
 
 /**
@@ -66,9 +64,9 @@ const standaloneConfig = [
 
   // TypeScript rules with plugin registration
   {
-    files: ["**/*.ts", "**/*.tsx"],
+    files: ['**/*.ts', '**/*.tsx'],
     plugins: {
-      "@typescript-eslint": tseslint,
+      '@typescript-eslint': tseslint,
     },
     languageOptions: {
       parser: tsParser,
