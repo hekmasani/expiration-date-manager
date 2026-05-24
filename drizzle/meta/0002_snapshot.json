@@ -57,12 +57,8 @@
           "name": "food_alert_setting_table_food_id_food_table_id_fk",
           "tableFrom": "food_alert_setting_table",
           "tableTo": "food_table",
-          "columnsFrom": [
-            "food_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["food_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -146,12 +142,8 @@
           "name": "food_instance_table_food_id_food_table_id_fk",
           "tableFrom": "food_instance_table",
           "tableTo": "food_table",
-          "columnsFrom": [
-            "food_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["food_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -209,9 +201,7 @@
       "indexes": {
         "food_table_barcode_unique": {
           "name": "food_table_barcode_unique",
-          "columns": [
-            "barcode"
-          ],
+          "columns": ["barcode"],
           "isUnique": true
         }
       },
@@ -311,12 +301,8 @@
           "name": "recipe_ingredient_table_recipe_id_recipe_table_id_fk",
           "tableFrom": "recipe_ingredient_table",
           "tableTo": "recipe_table",
-          "columnsFrom": [
-            "recipe_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["recipe_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -324,12 +310,8 @@
           "name": "recipe_ingredient_table_food_id_food_table_id_fk",
           "tableFrom": "recipe_ingredient_table",
           "tableTo": "food_table",
-          "columnsFrom": [
-            "food_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["food_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }

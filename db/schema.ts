@@ -32,15 +32,12 @@ export const foodInstanceTable = sqliteTable('food_instance_table', {
   updated_at: integer({ mode: 'timestamp' }).notNull(),
 });
 
-export const foodInstanceRelations = relations(
-  foodInstanceTable,
-  ({ one }) => ({
-    food: one(foodTable, {
-      fields: [foodInstanceTable.food_id],
-      references: [foodTable.id],
-    }),
+export const foodInstanceRelations = relations(foodInstanceTable, ({ one }) => ({
+  food: one(foodTable, {
+    fields: [foodInstanceTable.food_id],
+    references: [foodTable.id],
   }),
-);
+}));
 
 export const globalAlertSettingTable = sqliteTable('global_alert_setting_table', {
   id: int().primaryKey({ autoIncrement: true }),
@@ -61,15 +58,12 @@ export const foodAlertSettingTable = sqliteTable('food_alert_setting_table', {
   updated_at: integer({ mode: 'timestamp' }).notNull(),
 });
 
-export const foodAlertSettingRelations = relations(
-  foodAlertSettingTable,
-  ({ one }) => ({
-    food: one(foodTable, {
-      fields: [foodAlertSettingTable.food_id],
-      references: [foodTable.id],
-    }),
+export const foodAlertSettingRelations = relations(foodAlertSettingTable, ({ one }) => ({
+  food: one(foodTable, {
+    fields: [foodAlertSettingTable.food_id],
+    references: [foodTable.id],
   }),
-);
+}));
 
 export const recipeTable = sqliteTable('recipe_table', {
   id: int().primaryKey({ autoIncrement: true }),
@@ -98,16 +92,13 @@ export const recipeIngredientTable = sqliteTable('recipe_ingredient_table', {
   unit: text(),
 });
 
-export const recipeIngredientRelations = relations(
-  recipeIngredientTable,
-  ({ one }) => ({
-    recipe: one(recipeTable, {
-      fields: [recipeIngredientTable.recipe_id],
-      references: [recipeTable.id],
-    }),
-    food: one(foodTable, {
-      fields: [recipeIngredientTable.food_id],
-      references: [foodTable.id],
-    }),
+export const recipeIngredientRelations = relations(recipeIngredientTable, ({ one }) => ({
+  recipe: one(recipeTable, {
+    fields: [recipeIngredientTable.recipe_id],
+    references: [recipeTable.id],
   }),
-);
+  food: one(foodTable, {
+    fields: [recipeIngredientTable.food_id],
+    references: [foodTable.id],
+  }),
+}));

@@ -53,9 +53,7 @@
       "indexes": {
         "food_table_barecode_unique": {
           "name": "food_table_barecode_unique",
-          "columns": [
-            "barecode"
-          ],
+          "columns": ["barecode"],
           "isUnique": true
         }
       },

@@ -7,8 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { drizzle } from 'drizzle-orm/expo-sqlite';
-import * as SQLite from 'expo-sqlite';
+import { DatabaseProvider } from '@/db/DatabaseProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -22,9 +21,6 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
-const expo = SQLite.openDatabaseSync('db.db');
-const db = drizzle(expo);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -47,7 +43,11 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <DatabaseProvider>
+      <RootLayoutNav />
+    </DatabaseProvider>
+  );
 }
 
 function RootLayoutNav() {
