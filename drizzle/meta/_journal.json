@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1779221669108,
-      "tag": "0000_needy_starbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1779294460675,
-      "tag": "0001_rename_barecode_to_barcode",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1779294955751,
-      "tag": "0002_add_all_tables",
+      "when": 1779649346503,
+      "tag": "0000_cheerful_stingray",
       "breakpoints": true
     }
   ]

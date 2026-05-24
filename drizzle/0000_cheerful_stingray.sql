@@ -21,6 +21,16 @@ CREATE TABLE `food_instance_table` (
 	FOREIGN KEY (`food_id`) REFERENCES `food_table`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
+CREATE TABLE `food_table` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`name` text NOT NULL,
+	`barcode` text NOT NULL,
+	`image_url` text,
+	`created_at` integer NOT NULL,
+	`updated_at` integer NOT NULL
+);
+--> statement-breakpoint
+CREATE UNIQUE INDEX `food_table_barcode_unique` ON `food_table` (`barcode`);--> statement-breakpoint
 CREATE TABLE `global_alert_setting_table` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`days_before` integer NOT NULL,
