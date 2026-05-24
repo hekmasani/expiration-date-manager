@@ -10,6 +10,8 @@ export function ExternalLink(
     <Link
       target="_blank"
       {...props}
+      // External links are intentionally outside Expo Router's typed route union.
+      // @ts-expect-error href accepts external strings at runtime.
       href={props.href}
       onPress={(e) => {
         if (Platform.OS !== 'web') {

@@ -7,7 +7,7 @@ const { sharedBaseRules, sharedTsRules, prettierConfig } = require('./eslint.con
 module.exports = defineConfig([
   expoConfig,
   {
-    ignores: ['dist/*', '.expo/*'],
+    ignores: ['dist/*', '.expo/*', 'drizzle/**'],
   },
   {
     rules: {
