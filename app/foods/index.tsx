@@ -1,3 +1,4 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { FlatList, View } from 'react-native';
@@ -11,7 +12,13 @@ import { useFoods } from '@/hooks/useDatabase';
 
 export default function FoodListScreen() {
   const router = useRouter();
-  const { foods } = useFoods();
+  const { foods, refetch } = useFoods();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
 
   return (
     <ScreenView>
