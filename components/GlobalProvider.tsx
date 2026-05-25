@@ -13,13 +13,14 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
 
   return (
     <GlobalContext.Provider value={{ isLoading, setIsLoading }}>
-      {isLoading ? (
-        <View className="flex-1 items-center justify-center bg-slate-50">
-          <ActivityIndicator size="large" color="#059669" />
-        </View>
-      ) : (
-        children
-      )}
+      <View className="flex-1">
+        {children}
+        {isLoading ? (
+          <View className="absolute inset-0 items-center justify-center bg-slate-50/60">
+            <ActivityIndicator size="large" color="#059669" />
+          </View>
+        ) : null}
+      </View>
     </GlobalContext.Provider>
   );
 }
