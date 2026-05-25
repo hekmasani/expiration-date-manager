@@ -30,6 +30,24 @@ export type InsertGlobalAlertSetting = typeof globalAlertSettingTable.$inferInse
 export type FoodAlertSetting = typeof foodAlertSettingTable.$inferSelect;
 export type InsertFoodAlertSetting = typeof foodAlertSettingTable.$inferInsert;
 
+export function useFoodLookup() {
+  const db = useDatabase();
+
+  const findFoodByBarcode = useCallback(
+    async (barcode: string): Promise<Food | null> => {
+      try {
+        const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
+        return result.length > 0 ? result[0] : null;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
+
+  return { findFoodByBarcode };
+}
+
 export function useFoods() {
   const db = useDatabase();
   const { setIsLoading } = useGlobalLoading();
