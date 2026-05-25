@@ -8,16 +8,29 @@ import { FoodCard } from '@/components/foods';
 import { ScreenView } from '@/components/layout';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
 import { Text } from '@/components/ui/Text';
-import { useFoods } from '@/hooks/useDatabase';
+import { FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
+
+function getFoodSummary(foodId: number, instances: FoodInstance[]) {
+  const activeInstances = instances.filter(
+    (instance) => instance.food_id === foodId && instance.status === 'active'
+  );
+
+  return {
+    activeLotCount: activeInstances.length,
+    nearestExpiration: activeInstances[0]?.expiration_date,
+  };
+}
 
 export default function FoodListScreen() {
   const router = useRouter();
   const { foods, refetch } = useFoods();
+  const { instances, refetch: refetchInstances } = useFoodInstances();
 
   useFocusEffect(
     React.useCallback(() => {
       refetch();
-    }, [refetch])
+      refetchInstances();
+    }, [refetch, refetchInstances])
   );
 
   return (
@@ -29,9 +42,23 @@ export default function FoodListScreen() {
       <FlatList
         data={foods}
         keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <FoodCard food={item} onPress={() => router.push(`/foods/${item.id}`)} />
-        )}
+        renderItem={({ item }) => {
+          const summary = getFoodSummary(item.id, instances);
+
+          return (
+            <FoodCard
+              food={item}
+              activeLotCount={summary.activeLotCount}
+              nearestExpiration={summary.nearestExpiration}
+              onPress={() => router.push(`/foods/${item.id}`)}
+            />
+          );
+        }}
+        refreshing={false}
+        onRefresh={() => {
+          refetch();
+          refetchInstances();
+        }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 96 }}
         ListEmptyComponent={
           <EmptyState

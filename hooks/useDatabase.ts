@@ -1,4 +1,4 @@
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { useState, useEffect, useCallback } from 'react';
 
 import { useGlobalLoading } from '@/components/GlobalProvider';
@@ -155,7 +155,10 @@ export function useFoodInstances() {
     setLoading(true);
     setIsLoading(true);
     try {
-      const data = await db.select().from(foodInstanceTable);
+      const data = await db
+        .select()
+        .from(foodInstanceTable)
+        .orderBy(asc(foodInstanceTable.expiration_date));
       setInstances(data);
       setError(null);
     } catch (e) {
@@ -209,7 +212,23 @@ export function useFoodInstances() {
         return await db
           .select()
           .from(foodInstanceTable)
-          .where(eq(foodInstanceTable.food_id, foodId));
+          .where(eq(foodInstanceTable.food_id, foodId))
+          .orderBy(asc(foodInstanceTable.expiration_date));
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
+
+  const getActiveInstancesByFoodId = useCallback(
+    async (foodId: number) => {
+      try {
+        return await db
+          .select()
+          .from(foodInstanceTable)
+          .where(and(eq(foodInstanceTable.food_id, foodId), eq(foodInstanceTable.status, 'active')))
+          .orderBy(asc(foodInstanceTable.expiration_date));
       } catch (e) {
         throw e;
       }
@@ -226,6 +245,7 @@ export function useFoodInstances() {
     updateInstance,
     deleteInstance,
     getInstancesByFoodId,
+    getActiveInstancesByFoodId,
   };
 }
 

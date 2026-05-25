@@ -6,12 +6,20 @@ import { Alert } from 'react-native';
 
 import { FoodFormValues } from '@/components/foods';
 import { useGlobalLoading } from '@/components/GlobalProvider';
-import { Food, useFoods } from '@/hooks/useDatabase';
+import { Food, FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
+
+export type FoodInstanceFormValues = {
+  expirationDate: string;
+  quantity: number;
+};
 
 type FoodIdContextType = {
   food: Food;
+  activeInstances: FoodInstance[];
   barcodeError: string;
+  handleAddInstance: (values: FoodInstanceFormValues) => Promise<void>;
   handleDelete: () => void;
+  handleDeleteInstance: (instanceId: number) => void;
   handleSubmit: (values: FoodFormValues) => Promise<void>;
 };
 
@@ -31,7 +39,9 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
   const router = useRouter();
   const { setIsLoading } = useGlobalLoading();
   const { deleteFood, findFoodById, findFoodByBarcode, updateFood } = useFoods();
+  const { addInstance, deleteInstance, getActiveInstancesByFoodId } = useFoodInstances();
   const [food, setFood] = useState<Food | null>();
+  const [activeInstances, setActiveInstances] = useState<FoodInstance[]>([]);
   const [barcodeError, setBarcodeError] = useState('');
 
   useEffect(() => {
@@ -40,6 +50,11 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
       try {
         const data = await findFoodById(foodId);
         setFood(data);
+
+        if (data) {
+          const instances = await getActiveInstancesByFoodId(foodId);
+          setActiveInstances(instances);
+        }
       } catch (error) {
         console.error(error);
         setFood(null);
@@ -49,7 +64,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
 
     loadFood();
-  }, [findFoodById, foodId, setIsLoading]);
+  }, [findFoodById, foodId, getActiveInstancesByFoodId, setIsLoading]);
 
   const handleDelete = () => {
     Alert.alert('Supprimer cet aliment ?', 'Cette action est définitive.', [
@@ -60,6 +75,41 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
         onPress: async () => {
           await deleteFood(foodId);
           router.back();
+        },
+      },
+    ]);
+  };
+
+  const handleAddInstance = async (values: FoodInstanceFormValues) => {
+    try {
+      const now = new Date();
+      await addInstance({
+        food_id: foodId,
+        expiration_date: values.expirationDate,
+        quantity: values.quantity,
+        status: 'active',
+        created_at: now,
+        updated_at: now,
+      });
+      router.back();
+    } catch (error) {
+      Alert.alert(
+        'Erreur',
+        error instanceof Error ? error.message : "Impossible d'ajouter le lot."
+      );
+    }
+  };
+
+  const handleDeleteInstance = (instanceId: number) => {
+    Alert.alert('Supprimer ce lot ?', 'Cette action est définitive.', [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteInstance(instanceId);
+          const instances = await getActiveInstancesByFoodId(foodId);
+          setActiveInstances(instances);
         },
       },
     ]);
@@ -92,7 +142,17 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
   if (food === null) return <NotFoundScreen />;
 
   return (
-    <FoodIdContext.Provider value={{ food, barcodeError, handleDelete, handleSubmit }}>
+    <FoodIdContext.Provider
+      value={{
+        food,
+        activeInstances,
+        barcodeError,
+        handleAddInstance,
+        handleDelete,
+        handleDeleteInstance,
+        handleSubmit,
+      }}
+    >
       {children}
     </FoodIdContext.Provider>
   );

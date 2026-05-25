@@ -34,16 +34,32 @@ export function FoodImage({ uri, size = 64 }: { uri?: string | null; size?: numb
   );
 }
 
-export function FoodCard({ food, onPress }: { food: Food; onPress: () => void }) {
+export function FoodCard({
+  food,
+  activeLotCount = 0,
+  nearestExpiration,
+  onPress,
+}: {
+  food: Food;
+  activeLotCount?: number;
+  nearestExpiration?: string;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       onPress={onPress}
       className="mb-3 flex-row items-center gap-3 rounded-3xl border border-slate-200 bg-white p-3"
     >
       <FoodImage uri={food.image_url} />
-      <Text variant="subtitle" className="flex-1">
-        {food.name}
-      </Text>
+      <View className="flex-1 gap-1">
+        <Text variant="subtitle">{food.name}</Text>
+        <Text variant="caption" tone="subtle">
+          {activeLotCount} lot{activeLotCount > 1 ? 's' : ''} actif{activeLotCount > 1 ? 's' : ''}
+        </Text>
+        <Text variant="caption" tone="subtle">
+          Prochaine péremption : {nearestExpiration ?? '—'}
+        </Text>
+      </View>
       <FontAwesome name="chevron-right" size={16} color="#94a3b8" />
     </Pressable>
   );
