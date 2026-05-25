@@ -1,6 +1,7 @@
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { useState, useEffect, useCallback } from 'react';
 
+import { useGlobalLoading } from '@/components/GlobalProvider';
 import { useDatabase } from '@/db/DatabaseProvider';
 import {
   foodTable,
@@ -31,22 +32,25 @@ export type InsertFoodAlertSetting = typeof foodAlertSettingTable.$inferInsert;
 
 export function useFoods() {
   const db = useDatabase();
+  const { setIsLoading } = useGlobalLoading();
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchFoods = useCallback(async () => {
     setLoading(true);
+    setIsLoading(true);
     try {
-      const data = await db.select().from(foodTable);
+      const data = await db.select().from(foodTable).orderBy(asc(foodTable.name));
       setFoods(data);
       setError(null);
     } catch (e) {
       setError(e as Error);
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
-  }, [db]);
+  }, [db, setIsLoading]);
 
   useEffect(() => {
     fetchFoods();
@@ -85,14 +89,29 @@ export function useFoods() {
     }
   };
 
-  const getFoodByBarcode = async (barcode: string) => {
-    try {
-      const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
-      return result[0] || null;
-    } catch (e) {
-      throw e;
-    }
-  };
+  const findFoodById = useCallback(
+    async (id: number): Promise<Food | null> => {
+      try {
+        const result = await db.select().from(foodTable).where(eq(foodTable.id, id));
+        return result.length > 0 ? result[0] : null;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
+
+  const findFoodByBarcode = useCallback(
+    async (barcode: string): Promise<Food | null> => {
+      try {
+        const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
+        return result.length > 0 ? result[0] : null;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
   return {
     foods,
@@ -102,18 +121,21 @@ export function useFoods() {
     addFood,
     updateFood,
     deleteFood,
-    getFoodByBarcode,
+    findFoodById,
+    findFoodByBarcode,
   };
 }
 
 export function useFoodInstances() {
   const db = useDatabase();
+  const { setIsLoading } = useGlobalLoading();
   const [instances, setInstances] = useState<FoodInstance[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchInstances = useCallback(async () => {
     setLoading(true);
+    setIsLoading(true);
     try {
       const data = await db.select().from(foodInstanceTable);
       setInstances(data);
@@ -122,8 +144,9 @@ export function useFoodInstances() {
       setError(e as Error);
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
-  }, [db]);
+  }, [db, setIsLoading]);
 
   useEffect(() => {
     fetchInstances();
@@ -162,13 +185,19 @@ export function useFoodInstances() {
     }
   };
 
-  const getInstancesByFoodId = async (foodId: number) => {
-    try {
-      return await db.select().from(foodInstanceTable).where(eq(foodInstanceTable.food_id, foodId));
-    } catch (e) {
-      throw e;
-    }
-  };
+  const getInstancesByFoodId = useCallback(
+    async (foodId: number) => {
+      try {
+        return await db
+          .select()
+          .from(foodInstanceTable)
+          .where(eq(foodInstanceTable.food_id, foodId));
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
   return {
     instances,
@@ -184,12 +213,14 @@ export function useFoodInstances() {
 
 export function useRecipes() {
   const db = useDatabase();
+  const { setIsLoading } = useGlobalLoading();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchRecipes = useCallback(async () => {
     setLoading(true);
+    setIsLoading(true);
     try {
       const data = await db.select().from(recipeTable);
       setRecipes(data);
@@ -198,8 +229,9 @@ export function useRecipes() {
       setError(e as Error);
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
-  }, [db]);
+  }, [db, setIsLoading]);
 
   useEffect(() => {
     fetchRecipes();
@@ -308,12 +340,14 @@ export function useRecipes() {
 
 export function useAlertSettings() {
   const db = useDatabase();
+  const { setIsLoading } = useGlobalLoading();
   const [globalSettings, setGlobalSettings] = useState<GlobalAlertSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchGlobalSettings = useCallback(async () => {
     setLoading(true);
+    setIsLoading(true);
     try {
       const data = await db.select().from(globalAlertSettingTable);
       setGlobalSettings(data);
@@ -322,8 +356,9 @@ export function useAlertSettings() {
       setError(e as Error);
     } finally {
       setLoading(false);
+      setIsLoading(false);
     }
-  }, [db]);
+  }, [db, setIsLoading]);
 
   useEffect(() => {
     fetchGlobalSettings();

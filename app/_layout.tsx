@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
+import { GlobalProvider } from '@/components/GlobalProvider';
 import { useColorScheme } from '@/components/useColorScheme';
 import { DatabaseProvider } from '@/db/DatabaseProvider';
 
@@ -47,7 +48,9 @@ export default function RootLayout() {
 
   return (
     <DatabaseProvider>
-      <RootLayoutNav />
+      <GlobalProvider>
+        <RootLayoutNav />
+      </GlobalProvider>
     </DatabaseProvider>
   );
 }
