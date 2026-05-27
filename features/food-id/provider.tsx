@@ -1,11 +1,10 @@
 import { useRouter } from 'expo-router';
-
-import NotFoundScreen from '@/app/+not-found';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
-import { FoodFormValues } from '@/components/foods';
+import NotFoundScreen from '@/app/+not-found';
 import { useGlobalLoading } from '@/components/GlobalProvider';
+import { FoodFormValues } from '@/components/foods';
 import { Food, FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
 
 export type FoodInstanceFormValues = {

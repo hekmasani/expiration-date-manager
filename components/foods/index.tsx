@@ -99,8 +99,9 @@ export function FoodForm({
         <View className="items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4">
           <FoodImage uri={imageUrl.trim()} size={112} />
           <Text tone="subtle" className="text-center">
-            Collez une URL d'image. Les boutons caméra/galerie pourront être branchés sur un picker
-            natif.
+            {
+              "Collez une URL d'image. Les boutons caméra/galerie pourront être branchés sur un picker natif."
+            }
           </Text>
           <View className="w-full flex-row gap-2">
             <View className="flex-1">

@@ -435,16 +435,19 @@ export function useAlertSettings() {
     }
   };
 
-  const getFoodAlertSettings = async (foodId: number) => {
-    try {
-      return await db
-        .select()
-        .from(foodAlertSettingTable)
-        .where(eq(foodAlertSettingTable.food_id, foodId));
-    } catch (e) {
-      throw e;
-    }
-  };
+  const getFoodAlertSettings = useCallback(
+    async (foodId: number) => {
+      try {
+        return await db
+          .select()
+          .from(foodAlertSettingTable)
+          .where(eq(foodAlertSettingTable.food_id, foodId));
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
   const addFoodAlertSetting = async (setting: InsertFoodAlertSetting) => {
     try {
@@ -480,7 +483,6 @@ export function useAlertSettings() {
     globalSettings,
     loading,
     error,
-    refetchGlobalSettings: fetchGlobalSettings,
     addGlobalSetting,
     updateGlobalSetting,
     deleteGlobalSetting,
