@@ -1,7 +1,7 @@
 import { drizzle, ExpoSQLiteDatabase } from 'drizzle-orm/expo-sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import * as SQLite from 'expo-sqlite';
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { useGlobalContext } from '@/components/GlobalProvider';
@@ -33,16 +33,22 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   const { setIsLoading } = useGlobalContext();
   const { success, error } = useMigrations(db, migrations);
 
+  useEffect(() => {
+    if (error) {
+      Alert.alert('Une erreur est survenue');
+      return;
+    }
+
+    if (!success) {
+      setIsLoading(true);
+    } else {
+      setIsLoading(false);
+    }
+  }, [success, error, setIsLoading]);
+
   if (error) {
-    Alert.alert('Une erreur est survenue');
     return null;
   }
-
-  if (!success) {
-    setIsLoading(true);
-  }
-
-  setIsLoading(false);
 
   return <DatabaseContext.Provider value={db}>{children}</DatabaseContext.Provider>;
 }
