@@ -162,7 +162,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
   };
 
-  if (food === null) return <NotFoundScreen />;
+  if (!food) return <NotFoundScreen />;
 
   return (
     <FoodIdContext.Provider

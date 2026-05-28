@@ -1,8 +1,6 @@
 import { and, asc, desc, eq, ne } from 'drizzle-orm';
-import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { useCallback } from 'react';
 
-import { useGlobalContext } from '@/components/GlobalProvider';
 import { useDatabase } from '@/db/DatabaseProvider';
 import {
   foodTable,
@@ -35,98 +33,75 @@ export type InsertFoodAlertSetting = typeof foodAlertSettingTable.$inferInsert;
 export function useFoodLookup() {
   const db = useDatabase();
 
-  const findFoodByBarcode = async (barcode: string): Promise<Food | null> => {
+  const findFoodByBarcode = useCallback(async (barcode: string): Promise<Food | null> => {
     try {
       const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
       return result.length > 0 ? result[0] : null;
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
   return { findFoodByBarcode };
 }
 
 export function useFoods() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalContext();
-  const [foods, setFoods] = useState<Food[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchFoods = async () => {
-    setLoading(true);
-    setIsLoading(true);
-    try {
-      const data = await db.select().from(foodTable).orderBy(asc(foodTable.name));
-      setFoods(data);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Erreur', 'Une erreur est survenue');
-    } finally {
-      setLoading(false);
-      setIsLoading(false);
-    }
-  };
+  const fetchFoods = useCallback(async () => {
+    return await db.select().from(foodTable).orderBy(asc(foodTable.name));
+  }, [db]);
 
-  useEffect(() => {
-    fetchFoods();
-  }, []);
-
-  const addFood = async (food: InsertFood) => {
+  const addFood = useCallback(async (food: InsertFood) => {
     try {
       const result = await db.insert(foodTable).values(food).returning();
-      await fetchFoods();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const updateFood = async (id: number, food: Partial<InsertFood>) => {
+  const updateFood = useCallback(async (id: number, food: Partial<InsertFood>) => {
     try {
       const result = await db
         .update(foodTable)
         .set({ ...food, updated_at: new Date() })
         .where(eq(foodTable.id, id))
         .returning();
-      await fetchFoods();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const deleteFood = async (id: number) => {
+  const deleteFood = useCallback(async (id: number) => {
     try {
       await db.delete(foodTable).where(eq(foodTable.id, id));
-      await fetchFoods();
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const findFoodById = async (id: number): Promise<Food | null> => {
+  const findFoodById = useCallback(async (id: number): Promise<Food | null> => {
     try {
       const result = await db.select().from(foodTable).where(eq(foodTable.id, id));
       return result.length > 0 ? result[0] : null;
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const findFoodByBarcode = async (barcode: string): Promise<Food | null> => {
+  const findFoodByBarcode = useCallback(async (barcode: string): Promise<Food | null> => {
     try {
       const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
       return result.length > 0 ? result[0] : null;
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
   return {
-    foods,
-    loading,
-    refetch: fetchFoods,
+    fetchFoods,
     addFood,
     updateFood,
     deleteFood,
@@ -137,66 +112,45 @@ export function useFoods() {
 
 export function useFoodInstances() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalContext();
-  const [instances, setInstances] = useState<FoodInstance[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchInstances = async () => {
-    setLoading(true);
-    setIsLoading(true);
-    try {
-      const data = await db
-        .select()
-        .from(foodInstanceTable)
-        .orderBy(asc(foodInstanceTable.expiration_date));
-      setInstances(data);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Erreur', 'Une erreur est survenue');
-    } finally {
-      setLoading(false);
-      setIsLoading(false);
-    }
-  };
+  const fetchInstances = useCallback(async () => {
+    return await db
+      .select()
+      .from(foodInstanceTable)
+      .orderBy(asc(foodInstanceTable.expiration_date));
+  }, [db]);
 
-  useEffect(() => {
-    fetchInstances();
-  }, []);
-
-  const addInstance = async (instance: InsertFoodInstance) => {
+  const addInstance = useCallback(async (instance: InsertFoodInstance) => {
     try {
       const result = await db.insert(foodInstanceTable).values(instance).returning();
-      await fetchInstances();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const updateInstance = async (id: number, instance: Partial<InsertFoodInstance>) => {
+  const updateInstance = useCallback(async (id: number, instance: Partial<InsertFoodInstance>) => {
     try {
       const result = await db
         .update(foodInstanceTable)
         .set({ ...instance, updated_at: new Date() })
         .where(eq(foodInstanceTable.id, id))
         .returning();
-      await fetchInstances();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const deleteInstance = async (id: number) => {
+  const deleteInstance = useCallback(async (id: number) => {
     try {
       await db.delete(foodInstanceTable).where(eq(foodInstanceTable.id, id));
-      await fetchInstances();
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getInstancesByFoodId = async (foodId: number) => {
+  const getInstancesByFoodId = useCallback(async (foodId: number) => {
     try {
       return await db
         .select()
@@ -206,9 +160,9 @@ export function useFoodInstances() {
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getActiveInstancesByFoodId = async (foodId: number) => {
+  const getActiveInstancesByFoodId = useCallback(async (foodId: number) => {
     try {
       return await db
         .select()
@@ -218,9 +172,9 @@ export function useFoodInstances() {
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const archiveInstance = async (id: number, status: 'consumed' | 'discarded') => {
+  const archiveInstance = useCallback(async (id: number, status: 'consumed' | 'discarded') => {
     const now = new Date();
 
     try {
@@ -234,14 +188,13 @@ export function useFoodInstances() {
         })
         .where(eq(foodInstanceTable.id, id))
         .returning();
-      await fetchInstances();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getArchivedInstances = async (): Promise<FoodInstanceWithFood[]> => {
+  const getArchivedInstances = useCallback(async (): Promise<FoodInstanceWithFood[]> => {
     try {
       return await db.query.foodInstanceTable.findMany({
         where: ne(foodInstanceTable.status, 'active'),
@@ -251,26 +204,27 @@ export function useFoodInstances() {
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getArchivedInstanceById = async (id: number): Promise<FoodInstanceWithFood | null> => {
-    try {
-      const instance = await db.query.foodInstanceTable.findFirst({
-        where: and(eq(foodInstanceTable.id, id), ne(foodInstanceTable.status, 'active')),
-        with: { food: true },
-      });
+  const getArchivedInstanceById = useCallback(
+    async (id: number): Promise<FoodInstanceWithFood | null> => {
+      try {
+        const instance = await db.query.foodInstanceTable.findFirst({
+          where: and(eq(foodInstanceTable.id, id), ne(foodInstanceTable.status, 'active')),
+          with: { food: true },
+        });
 
-      if (instance) return instance;
-      return null;
-    } catch (e) {
-      throw e;
-    }
-  };
+        if (instance) return instance;
+        return null;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
   return {
-    instances,
-    loading,
-    refetch: fetchInstances,
+    fetchInstances,
     addInstance,
     updateInstance,
     deleteInstance,
@@ -284,101 +238,86 @@ export function useFoodInstances() {
 
 export function useRecipes() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalContext();
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchRecipes = async () => {
-    setLoading(true);
-    setIsLoading(true);
-    try {
-      const data = await db.select().from(recipeTable);
-      setRecipes(data);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Erreur', 'Une erreur est survenue');
-    } finally {
-      setLoading(false);
-      setIsLoading(false);
-    }
-  };
+  const fetchRecipes = useCallback(async () => {
+    return await db.select().from(recipeTable);
+  }, [db]);
 
-  useEffect(() => {
-    fetchRecipes();
-  }, []);
+  const addRecipe = useCallback(
+    async (
+      recipe: InsertRecipe,
+      ingredients: Omit<InsertRecipeIngredient, 'recipe_id'>[]
+    ) => {
+      try {
+        const result = await db.transaction(async (tx) => {
+          const newRecipe = await tx.insert(recipeTable).values(recipe).returning();
+          const recipeId = newRecipe[0].id;
 
-  const addRecipe = async (
-    recipe: InsertRecipe,
-    ingredients: Omit<InsertRecipeIngredient, 'recipe_id'>[]
-  ) => {
-    try {
-      const result = await db.transaction(async (tx) => {
-        const newRecipe = await tx.insert(recipeTable).values(recipe).returning();
-        const recipeId = newRecipe[0].id;
-
-        if (ingredients.length > 0) {
-          const ingredientValues = ingredients.map((ing) => ({
-            ...ing,
-            recipe_id: recipeId,
-          }));
-          await tx.insert(recipeIngredientTable).values(ingredientValues);
-        }
-
-        return newRecipe[0];
-      });
-      await fetchRecipes();
-      return result;
-    } catch (e) {
-      throw e;
-    }
-  };
-
-  const updateRecipe = async (
-    id: number,
-    recipe: Partial<InsertRecipe>,
-    ingredients?: Omit<InsertRecipeIngredient, 'recipe_id'>[]
-  ) => {
-    try {
-      const result = await db.transaction(async (tx) => {
-        const updated = await tx
-          .update(recipeTable)
-          .set({ ...recipe, updated_at: new Date() })
-          .where(eq(recipeTable.id, id))
-          .returning();
-
-        if (ingredients !== undefined) {
-          await tx.delete(recipeIngredientTable).where(eq(recipeIngredientTable.recipe_id, id));
           if (ingredients.length > 0) {
             const ingredientValues = ingredients.map((ing) => ({
               ...ing,
-              recipe_id: id,
+              recipe_id: recipeId,
             }));
             await tx.insert(recipeIngredientTable).values(ingredientValues);
           }
-        }
 
-        return updated[0];
-      });
-      await fetchRecipes();
-      return result;
-    } catch (e) {
-      throw e;
-    }
-  };
+          return newRecipe[0];
+        });
+        return result;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
-  const deleteRecipe = async (id: number) => {
+  const updateRecipe = useCallback(
+    async (
+      id: number,
+      recipe: Partial<InsertRecipe>,
+      ingredients?: Omit<InsertRecipeIngredient, 'recipe_id'>[]
+    ) => {
+      try {
+        const result = await db.transaction(async (tx) => {
+          const updated = await tx
+            .update(recipeTable)
+            .set({ ...recipe, updated_at: new Date() })
+            .where(eq(recipeTable.id, id))
+            .returning();
+
+          if (ingredients !== undefined) {
+            await tx.delete(recipeIngredientTable).where(eq(recipeIngredientTable.recipe_id, id));
+            if (ingredients.length > 0) {
+              const ingredientValues = ingredients.map((ing) => ({
+                ...ing,
+                recipe_id: id,
+              }));
+              await tx.insert(recipeIngredientTable).values(ingredientValues);
+            }
+          }
+
+          return updated[0];
+        });
+        return result;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
+
+  const deleteRecipe = useCallback(async (id: number) => {
     try {
       await db.transaction(async (tx) => {
         await tx.delete(recipeIngredientTable).where(eq(recipeIngredientTable.recipe_id, id));
         await tx.delete(recipeTable).where(eq(recipeTable.id, id));
       });
-      await fetchRecipes();
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getRecipeWithIngredients = async (id: number) => {
+  const getRecipeWithIngredients = useCallback(async (id: number) => {
     try {
       const recipe = await db.query.recipeTable.findFirst({
         where: eq(recipeTable.id, id),
@@ -394,12 +333,10 @@ export function useRecipes() {
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
   return {
-    recipes,
-    loading,
-    refetch: fetchRecipes,
+    fetchRecipes,
     addRecipe,
     updateRecipe,
     deleteRecipe,
@@ -409,63 +346,45 @@ export function useRecipes() {
 
 export function useAlertSettings() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalContext();
-  const [globalSettings, setGlobalSettings] = useState<GlobalAlertSetting[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchGlobalSettings = async () => {
-    setLoading(true);
-    setIsLoading(true);
-    try {
-      const data = await db.select().from(globalAlertSettingTable);
-      setGlobalSettings(data);
-    } catch (e) {
-      console.error(e);
-      Alert.alert('Erreur', 'Une erreur est survenue');
-    } finally {
-      setLoading(false);
-      setIsLoading(false);
-    }
-  };
+  const fetchGlobalSettings = useCallback(async () => {
+    return await db.select().from(globalAlertSettingTable);
+  }, [db]);
 
-  useEffect(() => {
-    fetchGlobalSettings();
-  }, []);
-
-  const addGlobalSetting = async (setting: InsertGlobalAlertSetting) => {
+  const addGlobalSetting = useCallback(async (setting: InsertGlobalAlertSetting) => {
     try {
       const result = await db.insert(globalAlertSettingTable).values(setting).returning();
-      await fetchGlobalSettings();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const updateGlobalSetting = async (id: number, setting: Partial<InsertGlobalAlertSetting>) => {
-    try {
-      const result = await db
-        .update(globalAlertSettingTable)
-        .set({ ...setting, updated_at: new Date() })
-        .where(eq(globalAlertSettingTable.id, id))
-        .returning();
-      await fetchGlobalSettings();
-      return result[0];
-    } catch (e) {
-      throw e;
-    }
-  };
+  const updateGlobalSetting = useCallback(
+    async (id: number, setting: Partial<InsertGlobalAlertSetting>) => {
+      try {
+        const result = await db
+          .update(globalAlertSettingTable)
+          .set({ ...setting, updated_at: new Date() })
+          .where(eq(globalAlertSettingTable.id, id))
+          .returning();
+        return result[0];
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
-  const deleteGlobalSetting = async (id: number) => {
+  const deleteGlobalSetting = useCallback(async (id: number) => {
     try {
       await db.delete(globalAlertSettingTable).where(eq(globalAlertSettingTable.id, id));
-      await fetchGlobalSettings();
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const getFoodAlertSettings = async (foodId: number) => {
+  const getFoodAlertSettings = useCallback(async (foodId: number) => {
     try {
       return await db
         .select()
@@ -474,41 +393,43 @@ export function useAlertSettings() {
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const addFoodAlertSetting = async (setting: InsertFoodAlertSetting) => {
+  const addFoodAlertSetting = useCallback(async (setting: InsertFoodAlertSetting) => {
     try {
       const result = await db.insert(foodAlertSettingTable).values(setting).returning();
       return result[0];
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
-  const updateFoodAlertSetting = async (id: number, setting: Partial<InsertFoodAlertSetting>) => {
-    try {
-      const result = await db
-        .update(foodAlertSettingTable)
-        .set({ ...setting, updated_at: new Date() })
-        .where(eq(foodAlertSettingTable.id, id))
-        .returning();
-      return result[0];
-    } catch (e) {
-      throw e;
-    }
-  };
+  const updateFoodAlertSetting = useCallback(
+    async (id: number, setting: Partial<InsertFoodAlertSetting>) => {
+      try {
+        const result = await db
+          .update(foodAlertSettingTable)
+          .set({ ...setting, updated_at: new Date() })
+          .where(eq(foodAlertSettingTable.id, id))
+          .returning();
+        return result[0];
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
 
-  const deleteFoodAlertSetting = async (id: number) => {
+  const deleteFoodAlertSetting = useCallback(async (id: number) => {
     try {
       await db.delete(foodAlertSettingTable).where(eq(foodAlertSettingTable.id, id));
     } catch (e) {
       throw e;
     }
-  };
+  }, [db]);
 
   return {
-    globalSettings,
-    loading,
+    fetchGlobalSettings,
     addGlobalSetting,
     updateGlobalSetting,
     deleteGlobalSetting,

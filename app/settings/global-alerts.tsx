@@ -1,17 +1,37 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, Switch, View } from 'react-native';
 
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { ScreenScrollView } from '@/components/layout';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { Text } from '@/components/ui/Text';
-import { useAlertSettings } from '@/hooks/useDatabase';
+import { GlobalAlertSetting, useAlertSettings } from '@/hooks/useDatabase';
 
 export default function GlobalAlertsScreen() {
-  const { globalSettings, addGlobalSetting, updateGlobalSetting, deleteGlobalSetting } =
+  const { setIsLoading } = useGlobalContext();
+  const { fetchGlobalSettings, addGlobalSetting, updateGlobalSetting, deleteGlobalSetting } =
     useAlertSettings();
+  const [globalSettings, setGlobalSettings] = useState<GlobalAlertSetting[]>([]);
   const [daysBefore, setDaysBefore] = useState('');
+
+  const loadSettings = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await fetchGlobalSettings();
+      setGlobalSettings(data);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erreur', 'Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchGlobalSettings, setIsLoading]);
+
+  useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const sortedSettings = [...globalSettings].sort((a, b) => b.days_before - a.days_before);
 
@@ -28,14 +48,23 @@ export default function GlobalAlertsScreen() {
       return;
     }
 
-    const now = new Date();
-    await addGlobalSetting({
-      days_before: value,
-      is_active: true,
-      created_at: now,
-      updated_at: now,
-    });
-    setDaysBefore('');
+    try {
+      const now = new Date();
+      await addGlobalSetting({
+        days_before: value,
+        is_active: true,
+        created_at: now,
+        updated_at: now,
+      });
+      setDaysBefore('');
+      await loadSettings();
+    } catch (error) {
+      console.error(error);
+      Alert.alert(
+        'Erreur',
+        error instanceof Error ? error.message : "Impossible d'ajouter le seuil."
+      );
+    }
   };
 
   return (
@@ -77,11 +106,34 @@ export default function GlobalAlertsScreen() {
                 <Switch
                   value={setting.is_active}
                   onValueChange={async (isActive) => {
-                    await updateGlobalSetting(setting.id, { is_active: isActive });
+                    try {
+                      await updateGlobalSetting(setting.id, { is_active: isActive });
+                      await loadSettings();
+                    } catch (error) {
+                      console.error(error);
+                      Alert.alert(
+                        'Erreur',
+                        error instanceof Error ? error.message : "Impossible de modifier le seuil."
+                      );
+                    }
                   }}
                 />
               </View>
-              <Button variant="destructive" onPress={() => deleteGlobalSetting(setting.id)}>
+              <Button
+                variant="destructive"
+                onPress={async () => {
+                  try {
+                    await deleteGlobalSetting(setting.id);
+                    await loadSettings();
+                  } catch (error) {
+                    console.error(error);
+                    Alert.alert(
+                      'Erreur',
+                      error instanceof Error ? error.message : 'Impossible de supprimer le seuil.'
+                    );
+                  }
+                }}
+              >
                 Supprimer
               </Button>
             </Card>

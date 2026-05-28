@@ -1,13 +1,14 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, FlatList, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { FoodCard } from '@/components/foods';
 import { ScreenView } from '@/components/layout';
 import { Input } from '@/components/ui/Input';
-import { FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
+import { Food, FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
 
 function useDebouncedValue<T>(value: T, delay = 300) {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -33,16 +34,32 @@ function getFoodSummary(foodId: number, instances: FoodInstance[]) {
 
 export default function SearchScreen() {
   const router = useRouter();
-  const { foods, refetch } = useFoods();
-  const { instances, refetch: refetchInstances } = useFoodInstances();
+  const { setIsLoading } = useGlobalContext();
+  const { fetchFoods } = useFoods();
+  const { fetchInstances } = useFoodInstances();
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [instances, setInstances] = useState<FoodInstance[]>([]);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query.trim().toLowerCase());
 
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [foodsData, instancesData] = await Promise.all([fetchFoods(), fetchInstances()]);
+      setFoods(foodsData);
+      setInstances(instancesData);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erreur', 'Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchFoods, fetchInstances, setIsLoading]);
+
   useFocusEffect(
     React.useCallback(() => {
-      refetch();
-      refetchInstances();
-    }, [refetch, refetchInstances])
+      loadData();
+    }, [loadData])
   );
 
   const results = useMemo(() => {

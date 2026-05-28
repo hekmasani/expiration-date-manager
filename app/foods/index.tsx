@@ -1,14 +1,15 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { FlatList, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Alert, FlatList, View } from 'react-native';
 
 import { EmptyState } from '@/components/EmptyState';
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { FoodCard } from '@/components/foods';
 import { ScreenView } from '@/components/layout';
 import { FloatingActionButton } from '@/components/ui/FloatingActionButton';
 import { Text } from '@/components/ui/Text';
-import { FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
+import { Food, FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
 
 function getFoodSummary(foodId: number, instances: FoodInstance[]) {
   const activeInstances = instances.filter(
@@ -23,14 +24,30 @@ function getFoodSummary(foodId: number, instances: FoodInstance[]) {
 
 export default function FoodListScreen() {
   const router = useRouter();
-  const { foods, refetch } = useFoods();
-  const { instances, refetch: refetchInstances } = useFoodInstances();
+  const { setIsLoading } = useGlobalContext();
+  const { fetchFoods } = useFoods();
+  const { fetchInstances } = useFoodInstances();
+  const [foods, setFoods] = useState<Food[]>([]);
+  const [instances, setInstances] = useState<FoodInstance[]>([]);
+
+  const loadData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [foodsData, instancesData] = await Promise.all([fetchFoods(), fetchInstances()]);
+      setFoods(foodsData);
+      setInstances(instancesData);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erreur', 'Une erreur est survenue');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [fetchFoods, fetchInstances, setIsLoading]);
 
   useFocusEffect(
     React.useCallback(() => {
-      refetch();
-      refetchInstances();
-    }, [refetch, refetchInstances])
+      loadData();
+    }, [loadData])
   );
 
   return (
@@ -55,10 +72,7 @@ export default function FoodListScreen() {
           );
         }}
         refreshing={false}
-        onRefresh={() => {
-          refetch();
-          refetchInstances();
-        }}
+        onRefresh={loadData}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 96 }}
         ListEmptyComponent={
           <EmptyState
