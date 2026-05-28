@@ -25,7 +25,7 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useGlobalLoading() {
+export function useGlobalContext() {
   const context = useContext(GlobalContext);
 
   if (!context) {

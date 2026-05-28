@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from 'react
 import { Alert } from 'react-native';
 
 import NotFoundScreen from '@/app/+not-found';
-import { useGlobalLoading } from '@/components/GlobalProvider';
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { FoodFormValues } from '@/components/foods';
 import { Food, FoodInstance, useFoodInstances, useFoods } from '@/hooks/useDatabase';
 
@@ -37,7 +37,7 @@ export function useFoodIdContextProvider() {
 
 export function FoodContextProvider({ children, foodId }: { children: ReactNode; foodId: number }) {
   const router = useRouter();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const { deleteFood, findFoodById, findFoodByBarcode, updateFood } = useFoods();
   const { addInstance, archiveInstance, deleteInstance, getActiveInstancesByFoodId } =
     useFoodInstances();
@@ -65,7 +65,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
 
     loadFood();
-  }, [foodId, setIsLoading]);
+  }, [findFoodById, foodId, getActiveInstancesByFoodId, setIsLoading]);
 
   const handleDelete = () => {
     Alert.alert('Supprimer cet aliment ?', 'Cette action est définitive.', [

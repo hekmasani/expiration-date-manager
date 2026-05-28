@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { createContext, ReactNode, useContext, useRef } from 'react';
 import { Alert } from 'react-native';
 
-import { useGlobalLoading } from '@/components/GlobalProvider';
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { useFoodLookup } from '@/hooks/useDatabase';
 
 type ScannerContextType = {
@@ -28,7 +28,7 @@ function normalizeBarcode(code: string) {
 
 export function ScannerContextProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const { findFoodByBarcode } = useFoodLookup();
   const isHandlingScanRef = useRef(false);
 

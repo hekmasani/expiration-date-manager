@@ -47,11 +47,11 @@ export default function RootLayout() {
   }
 
   return (
-    <DatabaseProvider>
-      <GlobalProvider>
+    <GlobalProvider>
+      <DatabaseProvider>
         <RootLayoutNav />
-      </GlobalProvider>
-    </DatabaseProvider>
+      </DatabaseProvider>
+    </GlobalProvider>
   );
 }
 

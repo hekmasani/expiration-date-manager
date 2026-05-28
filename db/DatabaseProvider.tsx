@@ -4,6 +4,8 @@ import * as SQLite from 'expo-sqlite';
 import React, { createContext, useContext, ReactNode } from 'react';
 import { Alert } from 'react-native';
 
+import { useGlobalContext } from '@/components/GlobalProvider';
+
 import migrations from '../drizzle/migrations';
 
 import * as schema from './schema';
@@ -28,6 +30,7 @@ interface DatabaseProviderProps {
 }
 
 export function DatabaseProvider({ children }: DatabaseProviderProps) {
+  const { setIsLoading } = useGlobalContext();
   const { success, error } = useMigrations(db, migrations);
 
   if (error) {
@@ -36,13 +39,10 @@ export function DatabaseProvider({ children }: DatabaseProviderProps) {
   }
 
   if (!success) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={{ marginTop: 10, color: '#666' }}>Initializing database...</Text>
-      </View>
-    );
+    setIsLoading(true);
   }
+
+  setIsLoading(false);
 
   return <DatabaseContext.Provider value={db}>{children}</DatabaseContext.Provider>;
 }

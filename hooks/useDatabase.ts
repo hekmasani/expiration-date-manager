@@ -2,7 +2,7 @@ import { and, asc, desc, eq, ne } from 'drizzle-orm';
 import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 
-import { useGlobalLoading } from '@/components/GlobalProvider';
+import { useGlobalContext } from '@/components/GlobalProvider';
 import { useDatabase } from '@/db/DatabaseProvider';
 import {
   foodTable,
