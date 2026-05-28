@@ -53,6 +53,7 @@ export function FoodNewContextProvider({
       });
       router.replace(`/foods/${food.id}`);
     } catch (error) {
+      console.error(error);
       Alert.alert(
         'Erreur',
         error instanceof Error ? error.message : "Impossible d'enregistrer l'aliment."

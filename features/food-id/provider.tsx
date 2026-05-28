@@ -65,7 +65,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
 
     loadFood();
-  }, [findFoodById, foodId, getActiveInstancesByFoodId, setIsLoading]);
+  }, [foodId, setIsLoading]);
 
   const handleDelete = () => {
     Alert.alert('Supprimer cet aliment ?', 'Cette action est définitive.', [
@@ -94,6 +94,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
       });
       router.back();
     } catch (error) {
+      console.error(error);
       Alert.alert(
         'Erreur',
         error instanceof Error ? error.message : "Impossible d'ajouter le lot."
@@ -153,6 +154,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
       });
       router.back();
     } catch (error) {
+      console.error(error);
       Alert.alert(
         'Erreur',
         error instanceof Error ? error.message : "Impossible de modifier l'aliment."
@@ -160,7 +162,6 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
   };
 
-  if (food === undefined) return null;
   if (food === null) return <NotFoundScreen />;
 
   return (

@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, ne } from 'drizzle-orm';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 
 import { useGlobalLoading } from '@/components/GlobalProvider';
 import { useDatabase } from '@/db/DatabaseProvider';
@@ -34,46 +35,42 @@ export type InsertFoodAlertSetting = typeof foodAlertSettingTable.$inferInsert;
 export function useFoodLookup() {
   const db = useDatabase();
 
-  const findFoodByBarcode = useCallback(
-    async (barcode: string): Promise<Food | null> => {
-      try {
-        const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
-        return result.length > 0 ? result[0] : null;
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const findFoodByBarcode = async (barcode: string): Promise<Food | null> => {
+    try {
+      const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
+      return result.length > 0 ? result[0] : null;
+    } catch (e) {
+      throw e;
+    }
+  };
 
   return { findFoodByBarcode };
 }
 
 export function useFoods() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchFoods = useCallback(async () => {
+  const fetchFoods = async () => {
     setLoading(true);
     setIsLoading(true);
     try {
       const data = await db.select().from(foodTable).orderBy(asc(foodTable.name));
       setFoods(data);
-      setError(null);
     } catch (e) {
-      setError(e as Error);
+      console.error(e);
+      Alert.alert('Erreur', 'Une erreur est survenue');
     } finally {
       setLoading(false);
       setIsLoading(false);
     }
-  }, [db, setIsLoading]);
+  };
 
   useEffect(() => {
     fetchFoods();
-  }, [fetchFoods]);
+  }, []);
 
   const addFood = async (food: InsertFood) => {
     try {
@@ -108,34 +105,27 @@ export function useFoods() {
     }
   };
 
-  const findFoodById = useCallback(
-    async (id: number): Promise<Food | null> => {
-      try {
-        const result = await db.select().from(foodTable).where(eq(foodTable.id, id));
-        return result.length > 0 ? result[0] : null;
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const findFoodById = async (id: number): Promise<Food | null> => {
+    try {
+      const result = await db.select().from(foodTable).where(eq(foodTable.id, id));
+      return result.length > 0 ? result[0] : null;
+    } catch (e) {
+      throw e;
+    }
+  };
 
-  const findFoodByBarcode = useCallback(
-    async (barcode: string): Promise<Food | null> => {
-      try {
-        const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
-        return result.length > 0 ? result[0] : null;
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const findFoodByBarcode = async (barcode: string): Promise<Food | null> => {
+    try {
+      const result = await db.select().from(foodTable).where(eq(foodTable.barcode, barcode));
+      return result.length > 0 ? result[0] : null;
+    } catch (e) {
+      throw e;
+    }
+  };
 
   return {
     foods,
     loading,
-    error,
     refetch: fetchFoods,
     addFood,
     updateFood,
@@ -147,12 +137,11 @@ export function useFoods() {
 
 export function useFoodInstances() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const [instances, setInstances] = useState<FoodInstance[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchInstances = useCallback(async () => {
+  const fetchInstances = async () => {
     setLoading(true);
     setIsLoading(true);
     try {
@@ -161,18 +150,18 @@ export function useFoodInstances() {
         .from(foodInstanceTable)
         .orderBy(asc(foodInstanceTable.expiration_date));
       setInstances(data);
-      setError(null);
     } catch (e) {
-      setError(e as Error);
+      console.error(e);
+      Alert.alert('Erreur', 'Une erreur est survenue');
     } finally {
       setLoading(false);
       setIsLoading(false);
     }
-  }, [db, setIsLoading]);
+  };
 
   useEffect(() => {
     fetchInstances();
-  }, [fetchInstances]);
+  }, []);
 
   const addInstance = async (instance: InsertFoodInstance) => {
     try {
@@ -207,35 +196,29 @@ export function useFoodInstances() {
     }
   };
 
-  const getInstancesByFoodId = useCallback(
-    async (foodId: number) => {
-      try {
-        return await db
-          .select()
-          .from(foodInstanceTable)
-          .where(eq(foodInstanceTable.food_id, foodId))
-          .orderBy(asc(foodInstanceTable.expiration_date));
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const getInstancesByFoodId = async (foodId: number) => {
+    try {
+      return await db
+        .select()
+        .from(foodInstanceTable)
+        .where(eq(foodInstanceTable.food_id, foodId))
+        .orderBy(asc(foodInstanceTable.expiration_date));
+    } catch (e) {
+      throw e;
+    }
+  };
 
-  const getActiveInstancesByFoodId = useCallback(
-    async (foodId: number) => {
-      try {
-        return await db
-          .select()
-          .from(foodInstanceTable)
-          .where(and(eq(foodInstanceTable.food_id, foodId), eq(foodInstanceTable.status, 'active')))
-          .orderBy(asc(foodInstanceTable.expiration_date));
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const getActiveInstancesByFoodId = async (foodId: number) => {
+    try {
+      return await db
+        .select()
+        .from(foodInstanceTable)
+        .where(and(eq(foodInstanceTable.food_id, foodId), eq(foodInstanceTable.status, 'active')))
+        .orderBy(asc(foodInstanceTable.expiration_date));
+    } catch (e) {
+      throw e;
+    }
+  };
 
   const archiveInstance = async (id: number, status: 'consumed' | 'discarded') => {
     const now = new Date();
@@ -258,7 +241,7 @@ export function useFoodInstances() {
     }
   };
 
-  const getArchivedInstances = useCallback(async (): Promise<FoodInstanceWithFood[]> => {
+  const getArchivedInstances = async (): Promise<FoodInstanceWithFood[]> => {
     try {
       return await db.query.foodInstanceTable.findMany({
         where: ne(foodInstanceTable.status, 'active'),
@@ -268,29 +251,25 @@ export function useFoodInstances() {
     } catch (e) {
       throw e;
     }
-  }, [db]);
+  };
 
-  const getArchivedInstanceById = useCallback(
-    async (id: number): Promise<FoodInstanceWithFood | null> => {
-      try {
-        const instance = await db.query.foodInstanceTable.findFirst({
-          where: and(eq(foodInstanceTable.id, id), ne(foodInstanceTable.status, 'active')),
-          with: { food: true },
-        });
+  const getArchivedInstanceById = async (id: number): Promise<FoodInstanceWithFood | null> => {
+    try {
+      const instance = await db.query.foodInstanceTable.findFirst({
+        where: and(eq(foodInstanceTable.id, id), ne(foodInstanceTable.status, 'active')),
+        with: { food: true },
+      });
 
-        if (instance) return instance;
-        return null;
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+      if (instance) return instance;
+      return null;
+    } catch (e) {
+      throw e;
+    }
+  };
 
   return {
     instances,
     loading,
-    error,
     refetch: fetchInstances,
     addInstance,
     updateInstance,
@@ -305,29 +284,28 @@ export function useFoodInstances() {
 
 export function useRecipes() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchRecipes = useCallback(async () => {
+  const fetchRecipes = async () => {
     setLoading(true);
     setIsLoading(true);
     try {
       const data = await db.select().from(recipeTable);
       setRecipes(data);
-      setError(null);
     } catch (e) {
-      setError(e as Error);
+      console.error(e);
+      Alert.alert('Erreur', 'Une erreur est survenue');
     } finally {
       setLoading(false);
       setIsLoading(false);
     }
-  }, [db, setIsLoading]);
+  };
 
   useEffect(() => {
     fetchRecipes();
-  }, [fetchRecipes]);
+  }, []);
 
   const addRecipe = async (
     recipe: InsertRecipe,
@@ -421,7 +399,6 @@ export function useRecipes() {
   return {
     recipes,
     loading,
-    error,
     refetch: fetchRecipes,
     addRecipe,
     updateRecipe,
@@ -432,29 +409,28 @@ export function useRecipes() {
 
 export function useAlertSettings() {
   const db = useDatabase();
-  const { setIsLoading } = useGlobalLoading();
+  const { setIsLoading } = useGlobalContext();
   const [globalSettings, setGlobalSettings] = useState<GlobalAlertSetting[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchGlobalSettings = useCallback(async () => {
+  const fetchGlobalSettings = async () => {
     setLoading(true);
     setIsLoading(true);
     try {
       const data = await db.select().from(globalAlertSettingTable);
       setGlobalSettings(data);
-      setError(null);
     } catch (e) {
-      setError(e as Error);
+      console.error(e);
+      Alert.alert('Erreur', 'Une erreur est survenue');
     } finally {
       setLoading(false);
       setIsLoading(false);
     }
-  }, [db, setIsLoading]);
+  };
 
   useEffect(() => {
     fetchGlobalSettings();
-  }, [fetchGlobalSettings]);
+  }, []);
 
   const addGlobalSetting = async (setting: InsertGlobalAlertSetting) => {
     try {
@@ -489,19 +465,16 @@ export function useAlertSettings() {
     }
   };
 
-  const getFoodAlertSettings = useCallback(
-    async (foodId: number) => {
-      try {
-        return await db
-          .select()
-          .from(foodAlertSettingTable)
-          .where(eq(foodAlertSettingTable.food_id, foodId));
-      } catch (e) {
-        throw e;
-      }
-    },
-    [db]
-  );
+  const getFoodAlertSettings = async (foodId: number) => {
+    try {
+      return await db
+        .select()
+        .from(foodAlertSettingTable)
+        .where(eq(foodAlertSettingTable.food_id, foodId));
+    } catch (e) {
+      throw e;
+    }
+  };
 
   const addFoodAlertSetting = async (setting: InsertFoodAlertSetting) => {
     try {
@@ -536,7 +509,6 @@ export function useAlertSettings() {
   return {
     globalSettings,
     loading,
-    error,
     addGlobalSetting,
     updateGlobalSetting,
     deleteGlobalSetting,
