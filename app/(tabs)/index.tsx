@@ -1,8 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
+import { ActionCard } from '@/components/ActionCard';
 import { Text } from '@/components/ui/Text';
 
 export default function DashboardScreen() {
@@ -20,59 +19,33 @@ export default function DashboardScreen() {
         </Text>
       </View>
 
-      <Card className="mb-4 gap-4">
-        <View className="flex-row items-center gap-3">
-          <View className="flex-1">
-            <Text variant="title">Alertes</Text>
-            <Text tone="subtle" className="mt-1">
-              Consultez les lots proches de la péremption sur l’écran dédié.
-            </Text>
-          </View>
-        </View>
+      <ActionCard
+        title="Alertes"
+        description="Consultez les lots proches de la péremption sur l'écran dédié."
+        buttonLabel="Voir les alertes"
+        onPress={() => router.push('/alerts')}
+      />
 
-        <Button onPress={() => router.push('/alerts')}>Voir les alertes</Button>
-      </Card>
+      <ActionCard
+        title="Gestion des aliments"
+        description="Consultez la liste, ajoutez un aliment ou gérez ses lots."
+        buttonLabel="Voir les aliments"
+        onPress={() => router.push('/foods')}
+      />
 
-      <Card className="mb-4 gap-4">
-        <View className="flex-row items-center gap-3">
-          <View className="flex-1">
-            <Text variant="title">Gestion des aliments</Text>
-            <Text tone="subtle" className="mt-1">
-              Consultez la liste, ajoutez un aliment ou gérez ses lots.
-            </Text>
-          </View>
-        </View>
+      <ActionCard
+        title="Historique"
+        description="Consultez les lots consommés et jetés."
+        buttonLabel="Voir l'historique"
+        onPress={() => router.push('/history')}
+      />
 
-        <Button onPress={() => router.push('/foods')}>
-          <Text variant="button" tone="inverse">
-            Voir les aliments
-          </Text>
-        </Button>
-      </Card>
-
-      <Card className="mb-4 gap-4">
-        <View>
-          <Text variant="title">Historique</Text>
-          <Text tone="subtle" className="mt-1">
-            Consultez les lots consommés et jetés.
-          </Text>
-        </View>
-        <Button variant="primary" onPress={() => router.push('/history')}>
-          Voir l’historique
-        </Button>
-      </Card>
-
-      <Card className="gap-4">
-        <View>
-          <Text variant="title">Paramètres</Text>
-          <Text tone="subtle" className="mt-1">
-            Gérer les seuils globaux J-7, J-3, J-1.
-          </Text>
-        </View>
-        <Button variant="secondary" onPress={() => router.push('/settings/global-alerts')}>
-          Alertes globales
-        </Button>
-      </Card>
+      <ActionCard
+        title="Paramètres"
+        description="Gérer les seuils globaux J-7, J-3, J-1."
+        buttonLabel="Alertes globales"
+        onPress={() => router.push('/settings/global-alerts')}
+      />
     </ScrollView>
   );
 }
