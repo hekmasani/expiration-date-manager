@@ -30,9 +30,6 @@ export function FoodInstanceForm() {
     <View className="gap-5">
       <View className="rounded-3xl border border-slate-200 bg-white p-4">
         <Text variant="subtitle">{food.name}</Text>
-        <Text tone="subtle" className="mt-1">
-          Statut initial : actif
-        </Text>
       </View>
 
       <View className="gap-2">

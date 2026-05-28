@@ -1,6 +1,6 @@
 import { BarcodeScanningResult } from 'expo-camera';
 import { useRouter } from 'expo-router';
-import { createContext, ReactNode, useContext, useRef } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
 import { Alert } from 'react-native';
 
 import { useGlobalContext } from '@/components/GlobalProvider';
@@ -31,13 +31,33 @@ export function ScannerContextProvider({ children }: { children: ReactNode }) {
   const { setIsLoading } = useGlobalContext();
   const { findFoodByBarcode } = useFoodLookup();
   const isHandlingScanRef = useRef(false);
+  const lastScanRef = useRef<{ code: string; at: number } | null>(null);
+  const resetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cooldownMs = 1500;
 
-  async function handleBarcode(rawCode: string, shouldPlayFeedback = false) {
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  async function handleBarcode(rawCode: string) {
     const code = normalizeBarcode(rawCode);
+    const now = Date.now();
 
     if (!code || isHandlingScanRef.current) return;
 
+    if (lastScanRef.current) {
+      const isSameCode = lastScanRef.current.code === code;
+      const isWithinCooldown = now - lastScanRef.current.at < cooldownMs;
+
+      if (isSameCode && isWithinCooldown) return;
+    }
+
     isHandlingScanRef.current = true;
+    lastScanRef.current = { code, at: now };
     setIsLoading(true);
 
     try {
@@ -52,13 +72,20 @@ export function ScannerContextProvider({ children }: { children: ReactNode }) {
       console.error(error);
       Alert.alert("Impossible de vérifier ce code-barres pour l'instant.");
     } finally {
-      isHandlingScanRef.current = false;
+      if (resetTimeoutRef.current) {
+        clearTimeout(resetTimeoutRef.current);
+      }
+
+      resetTimeoutRef.current = setTimeout(() => {
+        isHandlingScanRef.current = false;
+      }, cooldownMs);
+
       setIsLoading(false);
     }
   }
 
   function handleBarcodeScanned(result: BarcodeScanningResult) {
-    handleBarcode(result.data, true).catch(console.error);
+    handleBarcode(result.data).catch(console.error);
   }
 
   return (
