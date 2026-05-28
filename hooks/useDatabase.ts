@@ -1,4 +1,4 @@
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, ne } from 'drizzle-orm';
 import { useState, useEffect, useCallback } from 'react';
 
 import { useGlobalLoading } from '@/components/GlobalProvider';
@@ -17,6 +17,7 @@ export type InsertFood = typeof foodTable.$inferInsert;
 
 export type FoodInstance = typeof foodInstanceTable.$inferSelect;
 export type InsertFoodInstance = typeof foodInstanceTable.$inferInsert;
+export type FoodInstanceWithFood = FoodInstance & { food: Food };
 
 export type Recipe = typeof recipeTable.$inferSelect;
 export type InsertRecipe = typeof recipeTable.$inferInsert;
@@ -236,6 +237,56 @@ export function useFoodInstances() {
     [db]
   );
 
+  const archiveInstance = async (id: number, status: 'consumed' | 'discarded') => {
+    const now = new Date();
+
+    try {
+      const result = await db
+        .update(foodInstanceTable)
+        .set({
+          status,
+          consumed_at: status === 'consumed' ? now : null,
+          discarded_at: status === 'discarded' ? now : null,
+          updated_at: now,
+        })
+        .where(eq(foodInstanceTable.id, id))
+        .returning();
+      await fetchInstances();
+      return result[0];
+    } catch (e) {
+      throw e;
+    }
+  };
+
+  const getArchivedInstances = useCallback(async (): Promise<FoodInstanceWithFood[]> => {
+    try {
+      return await db.query.foodInstanceTable.findMany({
+        where: ne(foodInstanceTable.status, 'active'),
+        with: { food: true },
+        orderBy: desc(foodInstanceTable.updated_at),
+      });
+    } catch (e) {
+      throw e;
+    }
+  }, [db]);
+
+  const getArchivedInstanceById = useCallback(
+    async (id: number): Promise<FoodInstanceWithFood | null> => {
+      try {
+        const instance = await db.query.foodInstanceTable.findFirst({
+          where: and(eq(foodInstanceTable.id, id), ne(foodInstanceTable.status, 'active')),
+          with: { food: true },
+        });
+
+        if (instance) return instance;
+        return null;
+      } catch (e) {
+        throw e;
+      }
+    },
+    [db]
+  );
+
   return {
     instances,
     loading,
@@ -244,8 +295,11 @@ export function useFoodInstances() {
     addInstance,
     updateInstance,
     deleteInstance,
+    archiveInstance,
     getInstancesByFoodId,
     getActiveInstancesByFoodId,
+    getArchivedInstances,
+    getArchivedInstanceById,
   };
 }
 

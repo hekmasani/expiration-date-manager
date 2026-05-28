@@ -19,7 +19,8 @@ function getExpirationColor(expirationDate: string) {
 
 export function FoodIdDetails() {
   const router = useRouter();
-  const { food, activeInstances, handleDelete, handleDeleteInstance } = useFoodIdContextProvider();
+  const { food, activeInstances, handleArchiveInstance, handleDelete, handleDeleteInstance } =
+    useFoodIdContextProvider();
 
   return (
     <>
@@ -78,6 +79,24 @@ export function FoodIdDetails() {
                   </View>
                 </View>
                 <View className="gap-2">
+                  <View className="flex-row gap-2">
+                    <Button
+                      className="flex-1"
+                      variant="secondary"
+                      onPress={() => handleArchiveInstance(instance.id, 'consumed')}
+                    >
+                      <Text variant="button">Consommé</Text>
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      variant="destructive"
+                      onPress={() => handleArchiveInstance(instance.id, 'discarded')}
+                    >
+                      <Text variant="button" tone="danger">
+                        Jeté
+                      </Text>
+                    </Button>
+                  </View>
                   <Button variant="secondary" onPress={() => {}}>
                     <Text variant="button">Modifier le lot</Text>
                   </Button>

@@ -18,6 +18,7 @@ type FoodIdContextType = {
   barcodeError: string;
   handleAddInstance: (values: FoodInstanceFormValues) => Promise<void>;
   handleDelete: () => void;
+  handleArchiveInstance: (instanceId: number, status: 'consumed' | 'discarded') => void;
   handleDeleteInstance: (instanceId: number) => void;
   handleSubmit: (values: FoodFormValues) => Promise<void>;
 };
@@ -38,7 +39,8 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
   const router = useRouter();
   const { setIsLoading } = useGlobalLoading();
   const { deleteFood, findFoodById, findFoodByBarcode, updateFood } = useFoods();
-  const { addInstance, deleteInstance, getActiveInstancesByFoodId } = useFoodInstances();
+  const { addInstance, archiveInstance, deleteInstance, getActiveInstancesByFoodId } =
+    useFoodInstances();
   const [food, setFood] = useState<Food | null>();
   const [activeInstances, setActiveInstances] = useState<FoodInstance[]>([]);
   const [barcodeError, setBarcodeError] = useState('');
@@ -99,6 +101,27 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
     }
   };
 
+  const handleArchiveInstance = (instanceId: number, status: 'consumed' | 'discarded') => {
+    const label = status === 'consumed' ? 'consommé' : 'jeté';
+
+    Alert.alert(
+      `Marquer ce lot comme ${label} ?`,
+      "Le lot sortira des lots actifs et apparaîtra dans l'historique.",
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: status === 'consumed' ? 'Consommé' : 'Jeté',
+          style: status === 'discarded' ? 'destructive' : 'default',
+          onPress: async () => {
+            await archiveInstance(instanceId, status);
+            const instances = await getActiveInstancesByFoodId(foodId);
+            setActiveInstances(instances);
+          },
+        },
+      ]
+    );
+  };
+
   const handleDeleteInstance = (instanceId: number) => {
     Alert.alert('Supprimer ce lot ?', 'Cette action est définitive.', [
       { text: 'Annuler', style: 'cancel' },
@@ -148,6 +171,7 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
         barcodeError,
         handleAddInstance,
         handleDelete,
+        handleArchiveInstance,
         handleDeleteInstance,
         handleSubmit,
       }}
