@@ -58,8 +58,6 @@ export default function SearchScreen() {
           value={query}
           onChangeText={setQuery}
           placeholder="Nom d'aliment"
-          autoCapitalize="none"
-          autoCorrect={false}
         />
       </View>
 
@@ -77,11 +75,6 @@ export default function SearchScreen() {
               onPress={() => router.push(`/foods/${item.id}`)}
             />
           );
-        }}
-        refreshing={false}
-        onRefresh={() => {
-          refetch();
-          refetchInstances();
         }}
         contentContainerStyle={{ flexGrow: 1, paddingBottom: 96 }}
         ListEmptyComponent={
