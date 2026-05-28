@@ -150,7 +150,6 @@ export function FoodContextProvider({ children, foodId }: { children: ReactNode;
       await updateFood(foodId, {
         name: values.name,
         barcode: values.barcode,
-        image_url: values.image_url || null,
       });
       router.back();
     } catch (error) {

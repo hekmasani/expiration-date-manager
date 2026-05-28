@@ -47,7 +47,6 @@ export function FoodNewContextProvider({
       const food = await addFood({
         name: values.name,
         barcode: values.barcode,
-        image_url: values.image_url || null,
         created_at: now,
         updated_at: now,
       });

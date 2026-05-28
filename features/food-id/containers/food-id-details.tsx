@@ -111,17 +111,6 @@ export function FoodIdDetails() {
           </View>
         )}
       </View>
-
-      <View className="mb-5">
-        <Text variant="title" className="mb-3">
-          Alertes personnalisées
-        </Text>
-        <View className="rounded-3xl border border-dashed border-slate-300 bg-white p-5">
-          <Text tone="subtle" className="text-center">
-            Les alertes personnalisées seront configurables ici.
-          </Text>
-        </View>
-      </View>
     </>
   );
 }

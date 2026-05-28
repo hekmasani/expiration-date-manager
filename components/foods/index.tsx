@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import React, { useEffect, useState } from 'react';
-import { Image, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
@@ -10,20 +10,9 @@ import type { Food } from '@/hooks/useDatabase';
 export type FoodFormValues = {
   name: string;
   barcode: string;
-  image_url: string;
 };
 
-export function FoodImage({ uri, size = 64 }: { uri?: string | null; size?: number }) {
-  if (uri) {
-    return (
-      <Image
-        source={{ uri }}
-        style={{ width: size, height: size }}
-        className="rounded-2xl bg-slate-200"
-      />
-    );
-  }
-
+export function FoodImage({ size = 64 }: { size?: number; uri?: string | null }) {
   return (
     <View
       style={{ width: size, height: size }}
@@ -50,7 +39,9 @@ export function FoodCard({
       onPress={onPress}
       className="mb-3 flex-row items-center gap-3 rounded-3xl border border-slate-200 bg-white p-3"
     >
-      <FoodImage uri={food.image_url} />
+      <View className="items-center justify-center rounded-2xl bg-emerald-100 p-3">
+        <FontAwesome name="cutlery" size={24} color="#059669" />
+      </View>
       <View className="flex-1 gap-1">
         <Text variant="subtitle">{food.name}</Text>
         <Text variant="caption" tone="subtle">
@@ -80,14 +71,12 @@ export function FoodForm({
 }) {
   const [name, setName] = useState(initialValues?.name ?? '');
   const [barcode, setBarcode] = useState(initialValues?.barcode ?? '');
-  const [imageUrl, setImageUrl] = useState(initialValues?.image_url ?? '');
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     setName(initialValues?.name ?? '');
     setBarcode(initialValues?.barcode ?? '');
-    setImageUrl(initialValues?.image_url ?? '');
-  }, [initialValues?.barcode, initialValues?.image_url, initialValues?.name]);
+  }, [initialValues?.barcode, initialValues?.name]);
 
   const nameError = submitted && !name.trim() ? 'Le nom est requis.' : undefined;
   const barcodeRequiredError =
@@ -95,29 +84,6 @@ export function FoodForm({
 
   return (
     <View className="gap-5">
-      {!hideImageField ? (
-        <View className="items-center gap-3 rounded-3xl border border-slate-200 bg-white p-4">
-          <FoodImage uri={imageUrl.trim()} size={112} />
-          <Text tone="subtle" className="text-center">
-            {
-              "Collez une URL d'image. Les boutons caméra/galerie pourront être branchés sur un picker natif."
-            }
-          </Text>
-          <View className="w-full flex-row gap-2">
-            <View className="flex-1">
-              <Button variant="secondary" onPress={() => {}}>
-                <Text variant="button">Caméra</Text>
-              </Button>
-            </View>
-            <View className="flex-1">
-              <Button variant="secondary" onPress={() => {}}>
-                <Text variant="button">Galerie</Text>
-              </Button>
-            </View>
-          </View>
-        </View>
-      ) : null}
-
       <Field
         label="Nom"
         value={name}
@@ -133,20 +99,11 @@ export function FoodForm({
         placeholder="Ex. 3560071234567"
         keyboardType="number-pad"
       />
-      {!hideImageField ? (
-        <Field
-          label="Image"
-          value={imageUrl}
-          onChangeText={setImageUrl}
-          placeholder="https://..."
-          autoCapitalize="none"
-        />
-      ) : null}
       <Button
         onPress={() => {
           setSubmitted(true);
           if (!name.trim() || !barcode.trim()) return;
-          onSubmit({ name: name.trim(), barcode: barcode.trim(), image_url: imageUrl.trim() });
+          onSubmit({ name: name.trim(), barcode: barcode.trim() });
         }}
       >
         <Text variant="button" tone="inverse">

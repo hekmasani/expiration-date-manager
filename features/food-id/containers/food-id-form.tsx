@@ -10,7 +10,6 @@ export function FoodIdForm() {
       initialValues={{
         name: food.name,
         barcode: food.barcode,
-        image_url: food.image_url ?? '',
       }}
       submitLabel="Enregistrer"
       barcodeError={barcodeError}
