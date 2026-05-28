@@ -26,7 +26,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: 'Tableau de bord',
           tabBarIcon: ({ color }) => <TabBarIcon name="dashboard" color={color} />,
         }}
       />
@@ -40,7 +40,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: 'Recherche',
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
         }}
       />

@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 
@@ -52,6 +52,7 @@ export default function FoodListScreen() {
 
   return (
     <ScreenView>
+      <Stack.Screen options={{ title: 'Aliments' }} />
       <View className="mb-4">
         <Text variant="display">Aliments</Text>
       </View>

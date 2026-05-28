@@ -1,5 +1,12 @@
+import { Stack } from 'expo-router';
+
 import { Text } from '@/components/Themed';
 
 export default function RecipeListScreen() {
-  return <Text>Liste des recettes</Text>;
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Recettes' }} />
+      <Text>Liste des recettes</Text>
+    </>
+  );
 }

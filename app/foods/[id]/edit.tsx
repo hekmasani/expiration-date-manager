@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
 import { ScreenScrollView } from '@/components/layout';
 import { Text } from '@/components/ui/Text';
@@ -11,6 +11,7 @@ export default function EditFoodScreen() {
 
   return (
     <FoodContextProvider foodId={foodId}>
+      <Stack.Screen options={{ title: 'Modifier un aliment' }} />
       <ScreenScrollView>
         <Text variant="display" className="mb-4">
           Modifier

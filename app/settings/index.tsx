@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { View } from 'react-native';
 
 import { ScreenScrollView } from '@/components/layout';
@@ -11,6 +11,7 @@ export default function SettingsScreen() {
 
   return (
     <ScreenScrollView>
+      <Stack.Screen options={{ title: 'Paramètres' }} />
       <View className="mb-4">
         <Text variant="display">Paramètres</Text>
       </View>

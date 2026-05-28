@@ -1,5 +1,5 @@
 import { useFocusEffect } from '@react-navigation/native';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 
@@ -69,6 +69,7 @@ export default function SearchScreen() {
 
   return (
     <ScreenView>
+      <Stack.Screen options={{ title: 'Recherche' }} />
       <View className="mb-4">
         <Input
           label="Recherche"

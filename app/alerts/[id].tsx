@@ -1,4 +1,4 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { View } from 'react-native';
 
 import { ScreenScrollView } from '@/components/layout';
@@ -29,6 +29,7 @@ export default function AlertDetailScreen() {
 
   return (
     <ScreenScrollView>
+      <Stack.Screen options={{ title: "Détail de l'alerte" }} />
       <View className="mb-4">
         <Text variant="display">Détail alerte</Text>
         <Text tone="subtle" className="mt-2">

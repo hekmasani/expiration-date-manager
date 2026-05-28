@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
 import { ScreenScrollView } from '@/components/layout';
 import { FoodIdDetails } from '@/features/food-id/containers/food-id-details';
@@ -10,6 +10,7 @@ export default function FoodDetailScreen() {
 
   return (
     <FoodContextProvider foodId={foodId}>
+      <Stack.Screen options={{ title: "Détails de l'aliment" }} />
       <ScreenScrollView>
         <FoodIdDetails />
       </ScreenScrollView>

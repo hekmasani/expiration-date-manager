@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Switch, View } from 'react-native';
 
@@ -75,6 +75,7 @@ export default function FoodAlertsScreen() {
 
   return (
     <ScreenScrollView>
+      <Stack.Screen options={{ title: "Alertes de l'aliment" }} />
       <View className="mb-4">
         <Text variant="display">Alertes</Text>
         <Text tone="subtle" className="mt-2">

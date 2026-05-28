@@ -1,3 +1,4 @@
+import { Stack } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Switch, View } from 'react-native';
 
@@ -69,6 +70,7 @@ export default function GlobalAlertsScreen() {
 
   return (
     <ScreenScrollView>
+      <Stack.Screen options={{ title: 'Alertes globales' }} />
       <View className="mb-4">
         <Text variant="display">Alertes globales</Text>
         <Text tone="subtle" className="mt-2">

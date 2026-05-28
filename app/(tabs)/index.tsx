@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
 import { ActionCard } from '@/components/ActionCard';
@@ -12,6 +12,7 @@ export default function DashboardScreen() {
       className="flex-1 bg-slate-50 px-4 py-4"
       contentContainerStyle={{ paddingBottom: 32 }}
     >
+      <Stack.Screen options={{ title: 'Tableau de bord' }} />
       <View className="mb-6">
         <Text variant="display">Tableau de bord</Text>
         <Text tone="subtle" className="mt-2">

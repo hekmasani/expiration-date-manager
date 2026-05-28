@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 
 import { ScreenScrollView } from '@/components/layout';
 import { Text } from '@/components/ui/Text';
@@ -10,6 +10,7 @@ export default function NewFoodScreen() {
 
   return (
     <FoodNewContextProvider initialBarcode={params.barcode ?? ''}>
+      <Stack.Screen options={{ title: 'Nouvel aliment' }} />
       <ScreenScrollView>
         <Text variant="display" className="mb-4">
           Nouvel aliment

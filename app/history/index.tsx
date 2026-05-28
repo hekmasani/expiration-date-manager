@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, View } from 'react-native';
 
@@ -56,6 +56,7 @@ export default function HistoryListScreen() {
 
   return (
     <ScreenView>
+      <Stack.Screen options={{ title: 'Historique' }} />
       <FlatList
         data={filteredItems}
         keyExtractor={(item) => String(item.id)}

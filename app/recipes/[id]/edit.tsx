@@ -1,5 +1,12 @@
+import { Stack } from 'expo-router';
+
 import { Text } from '@/components/Themed';
 
 export default function EditRecipeScreen() {
-  return <Text>Modifier la recette</Text>;
+  return (
+    <>
+      <Stack.Screen options={{ title: 'Modifier la recette' }} />
+      <Text>Modifier la recette</Text>
+    </>
+  );
 }

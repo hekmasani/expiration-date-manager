@@ -1,4 +1,4 @@
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { View } from 'react-native';
 
@@ -57,6 +57,7 @@ export default function HistoryDetailScreen() {
 
   return (
     <ScreenScrollView>
+      <Stack.Screen options={{ title: 'Détail du lot' }} />
       <Card className="mb-4 items-center gap-3">
         <FoodImage uri={instance.food.image_url} size={112} />
         <View className="items-center gap-1">

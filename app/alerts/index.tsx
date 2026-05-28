@@ -1,4 +1,4 @@
-import { useFocusEffect, useRouter } from 'expo-router';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { FlatList, View } from 'react-native';
 
@@ -20,6 +20,7 @@ export default function AlertListScreen() {
 
   return (
     <ScreenView>
+      <Stack.Screen options={{ title: 'Alertes' }} />
       <View className="mb-4">
         <Text variant="display">Alertes</Text>
         <Text tone="subtle" className="mt-2">
